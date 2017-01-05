@@ -148,7 +148,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; UI Functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(def message-map {:greeting "Hello!"
+(def ui-messages {:greeting "Hello!"
                   :grid-width "Please enter a grid width."
 		  :generations "How many generations would you like to see?"
 		  :initial-row "Do you want to set the initial generation?"
@@ -158,12 +158,12 @@
 (defn ask-input ([] (ask-input nil))
                 ([default-value] (let [input-value (read)] (if (empty? input-value) default-value input-value))))
 
-(defn display-message [message-key] (println (message-key message-map)))
+(defn display-message [message-key] (println (message-key ui-messages)))
 (defn get-input-with-message ([message-key] (do (display-message message-key) (ask-input)))
-                             ([message-key default-value] (do (println (str (message-key message-map) ": [" default-value "]")) (ask-input default-value))))
-;;                             ([message-key validation-fn default-value] (do (println (str (message-key message-map) " (" (apply str (map #(str % ",") valid-inputs)) ") : [" default-value "]")) (ask-input default-value))))
+                             ([message-key default-value] (do (println (str (message-key ui-messages) ": [" default-value "]")) (ask-input default-value))))
+;;                             ([message-key validation-fn default-value] (do (println (str (message-key ui-messages) " (" (apply str (map #(str % ",") valid-inputs)) ") : [" default-value "]")) (ask-input default-value))))
 
-;;(defn run-ui [messages message-map] ())
+;;(defn run-ui [messages ui-messages] ())
 
 (defn ask-grid-width [default-width] (get-input-with-message :grid-width default-width))
 (defn ask-initial-row [default-row] (get-input-with-message :initial-row (->> [false false true false false] row-to-render-row render-row-to-str)))
