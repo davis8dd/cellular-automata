@@ -11,16 +11,20 @@
 ;; Business Logic
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; Try storing bits as boolean values.  Comparisons will be made by comparing boolean arrays
+;; Try storing bits as boolean values.  Comparisons will be made by comparing boolean arrays
 
-;;(def front-things [[:off :off :off] [:on :off :off] [:off :on :off] [:off :off :on] [:on :on :off] [:on :off :on] [:off :on :on] [:on :on :on]])
+;; (def front-things [[:off :off :off] [:on :off :off] [:off :on :off] [:off :off :on] [:on :on :off] [:on :off :on] [:off :on :on] [:on :on :on]])
 (def rule-keys [[false false false] [true false false] [false true false] [false false true] [true true false] [true false true] [false true true] [true true true]])
 
 (defn int-to-bool-array [an-int] (vec (boolean-array (map #(= 1 %) (map #(Integer. (str %)) (Integer/toBinaryString an-int))))))
 (defn create-rule [an-int] (zipmap rule-keys (int-to-bool-array an-int))) ;; Return a set of (front-value, on/off) pairs for all front-things
 
 (defn pad-with-2 [initial-coll padding-value] (vector (->> initial-coll (into padding-value) (into padding-value))))
-(defn pad-with [a-coll padding-value] (concat [padding-value] a-coll [padding-value]))
+
+(defn pad-with
+    "Add supplied value to front and back of a sequence"
+    [a-coll padding-value]
+    (concat [padding-value] a-coll [padding-value]))
 
 (defn create-initial-row [width] (let [init-row (pad-with [true] (repeat (/ width 2) false))] (if (even? width) init-row (drop-last init-row))))
 
@@ -31,22 +35,42 @@
 ;(defn next-row [a-row subvec-size rule] (loop [counter 0] (if (< counter (- (count a-row) (dec subvec-size))) (do (println (str (subvec a-row counter (+ subvec-size counter)))) (recur (inc counter))))))
 ;(defn next-row [a-row subvec-size rule] (let [next-row []] (do (cons false next-row) (loop [counter 0] (if (< counter (- (count a-row) (dec subvec-size))) (do (cons (get rule (subvec a-row counter (+ subvec-size counter))) next-row) (recur (inc counter))))) (cons false next-row)) next-row))
 ;(defn next-row [a-row subvec-size rule] (loop [next-row [] counter 0] (if (< counter (- (count a-row) (dec subvec-size))) (do (into next-row (vector (get rule (subvec a-row counter (+ subvec-size counter))))) (recur next-row (inc counter))) next-row)))
-(defn calculate-next-generation [a-row subvec-size rule] (loop [next-row [] counter 0] (if (> counter (- (count a-row) subvec-size)) next-row (recur (into next-row (vector (get rule (subvec a-row counter (+ subvec-size counter))))) (inc counter)))))
-(defn get-next-row [a-vect rule] (pad-with (calculate-next-generation a-vect 3 rule) false))
+
+(defn calculate-next-generation
+    "Process a generation using a rule and return next generation"
+    [a-row subvec-size rule]
+    (loop [next-row [] counter 0]
+        (if (> counter (- (count a-row) subvec-size))
+	    next-row
+	    (recur (into next-row (vector (get rule (subvec a-row counter (+ subvec-size counter))))) (inc counter)))))
+
+(defn get-next-row
+    "Return next row in grid by calculating new generation"
+    [a-vect rule]
+    (pad-with (calculate-next-generation a-vect 3 rule) false))
 
 ;; Inputting the number of generations, and an optional array of values for 1st generation
 ;; Outputs a grid of (arraywidth + 2), or calculate width based on final generation
 ;; Starting generation is optional, default is 1 true in center
-(defn calculate-grid ([rule num-of-rows initial-row] (loop [grid [initial-row] counter 1] (if (> counter num-of-rows) grid (recur (conj grid (into (vector) (get-next-row (last grid) rule))) (inc counter)))))
-                     ([rule num-of-rows] (calculate-grid rule num-of-rows [false false false false true false false false false])))
+(defn calculate-grid
+    "Calculate grid of specified length using either a supplied or default starting generation"
+    ([rule num-of-rows initial-row]
+        (loop [grid [initial-row] counter 1]
+	    (if (> counter num-of-rows)
+	        grid
+		(recur (conj grid (into (vector) (get-next-row (last grid) rule))) (inc counter)))))
+    ([rule num-of-rows]
+        (calculate-grid rule num-of-rows [false false false false true false false false false])))
+;;      (calculate-grid rule num-of-rows (calculate-initial-row STUFF))))
  
 ;; Example of "final" product... should probably be part of unit test
 ;(calculate-grid (create-rule 137) 20)
 
 (defn display-grid
-  "Display rendered grid of cellular automata"
-  [rendered-grid]
-  (doseq [rendered-grid-row (vec rendered-grid)] (println rendered-grid-row)))
+    "Display rendered grid of cellular automata"
+    [rendered-grid]
+    (doseq [rendered-grid-row (vec rendered-grid)]
+        (println rendered-grid-row)))
 
 (defn cellular-automata [num-of-rows rule-number] (display-grid (calculate-grid (create-rule rule-number) num-of-rows)))
 
@@ -132,6 +156,16 @@
 (defn rendered-grid [grid] (->> grid (map row-to-render-row) (map render-row-to-str)))
 ;; (map println (map render-row-to-str (map row-to-render-row (calculate-grid (create-rule 172) 20 [false true false false true true false true false]))) )
 
+;;;; How many generations to display?  Three scenarios exist (the first two make assumptions based on immutable data):
+;; 1) Each new generation is identical to the previous.  Stop after detecting n identical generations.
+;; 2) The generations start repeating a pattern
+;; 3) Reach a maximum number of generations and stop, regardless of any patterns
+
+;;
+(defn repeated-generations [numbers] ())
+
+(defn generation-pattern [] ())
+
 ;;;;;;;;;;;;;;;;;;
 ;; full rendering:
 ; USE CASE 1: no border
@@ -155,18 +189,34 @@
                   :which-rule "Which rule would you like to use?" ; Valid values are [0, 255]
                   :exiting "Goodbye!"})
 
+(defn display-message [message-key] (println (message-key ui-messages)))
+
 (defn ask-input ([] (ask-input nil))
                 ([default-value] (let [input-value (read)] (if (empty? input-value) default-value input-value))))
 
-(defn display-message [message-key] (println (message-key ui-messages)))
-(defn get-input-with-message ([message-key] (do (display-message message-key) (ask-input)))
-                             ([message-key default-value] (do (println (str (message-key ui-messages) ": [" default-value "]")) (ask-input default-value))))
+(defn get-input-with-message
+    "Prompt user for input with message, optionally display default value"
+    ([message-key]
+        (do (display-message message-key)
+	    (ask-input)))
+    ([message-key default-value]
+        (do (println (str (message-key ui-messages) ": [" default-value "]"))
+	    (ask-input default-value))))
 ;;                             ([message-key validation-fn default-value] (do (println (str (message-key ui-messages) " (" (apply str (map #(str % ",") valid-inputs)) ") : [" default-value "]")) (ask-input default-value))))
 
 ;;(defn run-ui [messages ui-messages] ())
 
-(defn ask-grid-width [default-width] (get-input-with-message :grid-width default-width))
-(defn ask-initial-row [default-row] (get-input-with-message :initial-row (->> [false false true false false] row-to-render-row render-row-to-str)))
+(defn ask-grid-width
+    "Ask user for desired grid width"
+    [default-width]
+    (get-input-with-message :grid-width default-width))
+
+(defn ask-initial-row
+    "Ask user for initial generation"
+    [default-row]
+    (get-input-with-message :initial-row (->> [false false true false false] row-to-render-row render-row-to-str)))
+;;  (get-input-with-message :initial-row (->> (DEFAULT-ROW ???) row-to-render-row render-row-to-str)))
+
 ;(defn ask-generations [default-generations] (get-input-with-message :generations ))
 
 ;MOVE THIS TO THE PROPER SECTION
