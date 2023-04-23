@@ -9,13 +9,12 @@ The top row (or first generation) is the initial state, and subsequent generatio
 ### Rules
 A rule is a number between 0 - 255 that corresponds to an 8-bit value that represents how three adjacent cells determine the value of the middle cell in the next generation.
 
-Example: Rule 0:
+Rules:
 ```
-   1        2        3        4        5        6        7        8
 _______  _______  _______  _______  _______  _______  _______  _______
-|x|x|x|  |x|x|x|  |x|x|x|  |x|x|x|  |x|x|x|  |x|x|x|  |x|x|x|  |x|x|x|
+| | | |  |x| | |  | |x| |  | | |x|  |x|x| |  |x| |x|  | |x|x|  |x|x|x|
 _______  _______  _______  _______  _______  _______  _______  _______
-  |x|      |x|      |x|      |x|      |x|      |x|      |x|      |x|  
+  |1|      |2|      |3|      |4|      |5|      |6|      |7|      |8|  
 ```
 
 ## Installation
