@@ -5,7 +5,7 @@
 ;; Business Logic
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Try storing bits as boolean values.  Comparisons will be made by comparing boolean arrays
+;; Try storing bits as boolean values.  Comparisons will be made by comparing boolean arrays.
 
 ;; (def front-things [[:off :off :off] [:on :off :off] [:off :on :off] [:off :off :on] [:on :on :off] [:on :off :on] [:off :on :on] [:on :on :on]])
 (def rule-keys [[false false false]
@@ -17,19 +17,29 @@
                 [false true true]
                 [true true true]])
 
+(defn pad-front-to-length-with
+    "Add a number of padding values to the front of a sequence to make it the specified length."
+    [a-coll final-length padding-value]
+    (let [padding-size (- final-length (count a-coll))]
+    (into [] (flatten
+                 (concat (repeat padding-size padding-value) [a-coll])))))
+
 (defn int-to-bool-array
-    "Change integer to boolean array for representation of cell on/off states"
+    "Change integer to a boolean array to represent cell on/off states."
     [an-int]
-    (vec (boolean-array (map #(= 1 %)
-                             (map #(Integer. (str %))
-                                  (Integer/toBinaryString an-int))))))
+    (pad-front-to-length-with (do (map #(= 1 %)
+                                       (map #(Integer. (str %))
+                                            (Integer/toBinaryString an-int)))) 8 false))
 
 (defn create-rule
     "Create rule for processing next generation"
     [an-int]
-    (zipmap rule-keys (int-to-bool-array an-int))) ;; Return a set of (front-value, on/off) pairs for all front-things
+    (cond
+      (< an-int 0) nil
+      (> an-int 255) nil
+      :else (zipmap rule-keys (int-to-bool-array an-int)))) ;; Return a set of (front-value, on/off) pairs for all front-things
 
-(defn pad-with
+(defn pad-sides-with
     "Add supplied value to front and back of a sequence."
     [a-coll padding-value]
     (into [] (flatten
@@ -38,7 +48,7 @@
 (defn create-initial-row
     "Create a starting row of specified width with one 'on' cell in center of row"
     [width]
-    (let [init-row (pad-with true (repeat (/ width 2) false))]
+    (let [init-row (pad-sides-with true (repeat (/ width 2) false))]
         (if (> (count init-row) width)
             (into [] (drop 1 init-row))
             init-row)))
@@ -54,7 +64,7 @@
 (defn get-next-row
     "Return next row in grid by calculating new generation."
     [a-vect rule]
-    (pad-with
+    (pad-sides-with
         (calculate-next-generation
             a-vect
             3
@@ -94,16 +104,15 @@
 
 
 (def render-chars {:cells {:on (char 9607)
-;                              :off \ }
-                              :off (char 9617)}
-                      :border {:top (char 9552)
-                               :bottom (char 9552)
-                               :left (char 9553)
-                               :right (char 9553)
-                               :top-right (char 9559)
-                               :bottom-right (char 9565)
-                               :top-left (char 9556)
-                               :bottom-left (char 9562)}})
+                           :off (char 9617)}
+                           :border {:top (char 9552)
+                           :bottom (char 9552)
+                           :left (char 9553)
+                           :right (char 9553)
+                           :top-right (char 9559)
+                           :bottom-right (char 9565)
+                           :top-left (char 9556)
+                           :bottom-left (char 9562)}})
 
 
 ;;(defn print-chars [chars-rendered] (doseq [a-char chars-rendered] (println (str "*** " a-char " ***"))))
@@ -243,7 +252,7 @@
                   :grid-width "Please enter a grid width."
                   :generations "How many generations would you like to see?"
                   :initial-row "Do you want to set the initial generation?"
-                  :which-rule "Which rule would you like to use?" ; Valid values are [0, 255]
+                  :which-rule "Which rule would you like to use (Enter a number between [0, 255], or h for help)"
                   :exiting "Goodbye!"})
 
 (defn display-message
