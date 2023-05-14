@@ -40,36 +40,32 @@
       (> an-int 255) nil
       :else (zipmap rule-keys (int-to-bool-array an-int)))) ;; Return a set of (front-value, on/off) pairs for all front-things
 
-;(defn pad-sides-with
-;    "Add supplied value to front and back of a sequence."
-;    [a-coll padding-value]
-;    (into [] (flatten
-;                 (concat [padding-value] [a-coll] [padding-value]))))
-;
-;(defn create-initial-row
-;    "Create a starting row of specified width with one 'on' cell in center of row"
-;    [width]
-;    (let [init-row (pad-sides-with true (repeat (/ width 2) false))]
-;        (if (> (count init-row) width)
-;            (into [] (drop 1 init-row))
-;            init-row)))
-;(defn get-next-row
-;    "Return next row in grid by calculating new generation."
-;    [a-vect rule]
-;    (pad-sides-with
-;        (calculate-next-generation
-;            a-vect
-;            3
-;            rule)
-;        false))
-;
-;(defn calculate-next-generation
-;    "Process a generation using a rule and return next generation."
-;    [a-row subvec-size rule]
-;    (loop [next-row [] counter 0]
-;        (if (> counter (- (count a-row) subvec-size))
-;            next-row
-;            (recur (into next-row (vector (get rule (subvec a-row counter (+ subvec-size counter))))) (inc counter)))))
+(defn calculate-next-generation
+    "Process a generation using a rule and return next generation.
+     The rule specifies each element in the next generation
+     based on the current generation."
+    [a-row subvec-size rule]
+    (let [row-length (count a-row)]
+    (loop [next-row [] counter 0]
+        (if (> counter (- row-length subvec-size))
+            next-row
+            (recur (into next-row (vector (get rule (subvec a-row counter (+ subvec-size counter))))) (inc counter))))))
+
+(defn pad-sides-with
+    "Add supplied value to front and back of a sequence."
+    [a-seq padding-value]
+    (into [] (flatten
+                 (concat [padding-value] [a-seq] [padding-value]))))
+
+(defn get-next-row
+    "Return next row in grid by calculating new generation."
+    [a-vect rule]
+    (pad-sides-with
+        (calculate-next-generation
+            a-vect
+            3
+            rule)
+        false))
 
 ;; Inputting the number of generations, and an optional array of values for 1st generation
 ;; Outputs a grid of (arraywidth + 2), or calculate width based on final generation
@@ -80,7 +76,7 @@
         (loop [grid [initial-row] counter 1]
             (if (> counter num-of-rows)
                 grid
-                (recur (conj grid (into (vector) (graphics/get-next-row (last grid) rule))) (inc counter)))))
+                (recur (conj grid (into (vector) (get-next-row (last grid) rule))) (inc counter)))))
     ([rule num-of-rows]
         (calculate-grid rule num-of-rows [false false false false true false false false false])))
  
@@ -328,6 +324,7 @@
     []
     (do (display-message :greeting)
         (let [rule (ask-input-with-message :which-rule str-to-int)
+
               grid-width  (ask-input-with-message :grid-width str-to-int)
               grid-height (ask-input-with-message :generations str-to-int)
               the-grid ()]

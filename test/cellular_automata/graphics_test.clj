@@ -2,6 +2,19 @@
   (:require [clojure.test :refer :all]
             [cellular-automata.graphics :refer :all]))
 
+(deftest test-string-repeating-char-given-character-and-times-to-repeat-expect-character-repeated-that-many-times
+  (testing "Test that the given character is repeated in a string the specified number of times"
+    (let [a-char \a
+          times-to-repeat 5
+          expected-result "aaaaa"]
+      (is (= (string-repeating-char a-char times-to-repeat) expected-result)))))
+
+(deftest test-create-initial-row-given-row-width-expect-row-with-single-middle-value-set-to-true
+  (testing "Test create a row of false boolean values, with the exception of the middle which is 'on'"
+    (let [row-width 7
+          expected-result [false false false true false false false]]
+      (is (= (create-initial-row row-width) expected-result)))))
+
 (deftest test-pad-sides-with-value-given-zero-padding-expect-padding
   (testing "That invalid input is rejected"
     (let [input-value [1 2 3]

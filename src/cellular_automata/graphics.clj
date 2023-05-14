@@ -26,24 +26,6 @@
             (into [] (drop 1 init-row))
             init-row)))
 
-(defn calculate-next-generation
-    "Process a generation using a rule and return next generation."
-    [a-row subvec-size rule]
-    (loop [next-row [] counter 0]
-        (if (> counter (- (count a-row) subvec-size))
-            next-row
-            (recur (into next-row (vector (get rule (subvec a-row counter (+ subvec-size counter))))) (inc counter)))))
-
-(defn get-next-row
-    "Return next row in grid by calculating new generation."
-    [a-vect rule]
-    (pad-sides-with
-        (calculate-next-generation
-            a-vect
-            3
-            rule)
-        false))
-
 (defn display-grid
     "Display rendered grid of cellular automata."
     [rendered-grid]
