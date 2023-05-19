@@ -15,8 +15,15 @@
           expected-result [false false false true false false false]]
       (is (= (create-initial-row row-width) expected-result)))))
 
-(deftest test-pad-sides-with-value-given-zero-padding-expect-padding
-  (testing "That invalid input is rejected"
+(deftest test-pad-sides-with-given-char-expect-padded-sequence
+  (testing "Test that padding a sequence with a character returns the expected padded sequence."
+    (let [a-seq [1 2 3]
+          padding-value \#
+          expected-result [\# 1 2 3 \#]]
+      (is (= (pad-sides-with a-seq padding-value) expected-result)))))
+
+(deftest test-pad-sides-with-value-given-sequence-padding-expect-padding-with-sequence
+  (testing "Test that padding a sequence with a sequence returns the expected padded sequence."
     (let [input-value [1 2 3]
           expected-result [0 0 1 2 3 0 0]]
       (is (= (pad-sides-with input-value [0 0]) expected-result)))))

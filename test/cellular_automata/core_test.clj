@@ -40,13 +40,6 @@
           expected-value [0 0 1 2 3]]
       (is (= (pad-front-to-length-with initial-array final-size padding) expected-value))))
 
-(deftest test-pad-sides-with-given-???-expect-???
-  (testing "That invalid input is rejected"
-    (let [a-seq [1 2 3]
-          padding-value \#
-          expected-result [\# 1 2 3 \#]]
-      (is (= (pad-sides-with a-seq padding-value) expected-result)))))
-
 (deftest test-calculate-next-generation-given-valid-rule-expect-next-row-generated-from-rule
   (testing "That the passed rule is used to generate the next row"
     (let [a-vect (vector false false false true false false false)

@@ -1,6 +1,13 @@
 (ns cellular-automata.graphics
     (:gen-class))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Render functions
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; An example of displaying a grid.  This should probably be a unit test
+;(display-grid (calculate-grid (create-rule 177) 50 [false false false false false false false false false false true false false false false false false false false false false]))
+
 (def render-chars {:cells {:on (char 9607)
                            :off (char 9617)}
                            :border {:top (char 9552)
@@ -53,16 +60,12 @@
         (let [right-char (get-in render-view-chars [:border :right])
               left-char (get-in render-view-chars [:border :left])]
                   (concat (vector left-char) render-row (vector right-char))))
-                 ;(apply str (concat (str left-char)
-                 ;                   render-row
-                 ;                   (str right-char)))))
 
 (defn add-border-sides
     "Add border sides to group of rows"
     [render-view-chars render-grid]
         (let [right-char (get-in render-view-chars [:border :right])
               left-char (get-in render-view-chars [:border :left])]
-                 ;(reduce (fn [bordered-grid render-row] (conj bordered-grid (add-border-sides-to-row render-chars render-row))) []  render-grid)))
                  (reduce (fn [bordered-grid render-row] (conj bordered-grid (add-border-sides-to-row render-chars render-row))) []  render-grid)))
 
 (defn add-border-bottom
@@ -84,8 +87,6 @@
                     (into (add-border-sides render-chars content))
                     (into [(add-border-bottom render-chars content-width)]))))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;
-
 (defn row-to-render-row
     "Take a generation and return a list consumable by the View functions."
     [row]
@@ -95,8 +96,6 @@
     "Take a View-friendly generation and return a string ready for display rendering."
     [render-row]
     (apply str (map #(get (get render-chars :cells) %) render-row)))
-
-;(defn rendered-grid [grid] (map render-row-to-str (map row-to-render-row grid)))
 
 (defn rendered-grid
     [grid] (->> grid

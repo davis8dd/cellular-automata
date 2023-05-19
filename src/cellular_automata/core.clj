@@ -1,14 +1,12 @@
 (ns cellular-automata.core
     (:gen-class))
 
-(require '[cellular-automata.graphics :as graphics])
+(require '[cellular-automata.graphics :as graphics]
+         '[cellular-automata.input :as input])
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Business Logic
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Try storing bits as boolean values.  Comparisons will be made by comparing boolean arrays.
-
-;; (def front-things [[:off :off :off] [:on :off :off] [:off :on :off] [:off :off :on] [:on :on :off] [:on :off :on] [:off :on :on] [:on :on :on]])
 (def rule-keys [[false false false]
                 [true false false]
                 [false true false]
@@ -17,6 +15,13 @@
                 [true false true]
                 [false true true]
                 [true true true]])
+
+(def ui-messages {:greeting "Welcome to the elementary cellular automata generator!"
+                  :grid-width "Please enter a grid width."
+                  :generations "How many generations would you like to see?"
+                  :initial-row "Do you want to set the initial generation?"
+                  :which-rule "Which rule would you like to use (Enter a number between [0, 255], or h for help)"
+                  :exiting "Goodbye!"})
 
 (defn pad-front-to-length-with
     "Add a number of padding values to the front of a sequence to make it the specified length."
@@ -51,16 +56,10 @@
             next-row
             (recur (into next-row (vector (get rule (subvec a-row counter (+ subvec-size counter))))) (inc counter))))))
 
-(defn pad-sides-with
-    "Add supplied value to front and back of a sequence."
-    [a-seq padding-value]
-    (into [] (flatten
-                 (concat [padding-value] [a-seq] [padding-value]))))
-
 (defn get-next-row
     "Return next row in grid by calculating new generation."
     [a-vect rule]
-    (pad-sides-with
+    (graphics/pad-sides-with
         (calculate-next-generation
             a-vect
             3
@@ -80,180 +79,14 @@
     ([rule num-of-rows]
         (calculate-grid rule num-of-rows [false false false false true false false false false])))
  
-;; Example of "final" product... should probably be part of unit test
-;(calculate-grid (create-rule 137) 20)
-
-;(defn display-grid
-;   "Display rendered grid of cellular automata."
-;   [rendered-grid]
-;   (doseq [rendered-grid-row (vec rendered-grid)]
-;       (println rendered-grid-row)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Render functions
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; An example of displaying a grid.  This should probably be a unit test
-;; This one looks neat!
-;(display-grid (calculate-grid (create-rule 177) 50 [false false false false false false false false false false true false false false false false false false false false false]))
-
-
-;(def render-chars {:cells {:on (char 9607)
-;                           :off (char 9617)}
-;                           :border {:top (char 9552)
-;                           :bottom (char 9552)
-;                           :left (char 9553)
-;                           :right (char 9553)
-;                           :top-right (char 9559)
-;                           :bottom-right (char 9565)
-;                           :top-left (char 9556)
-;                           :bottom-left (char 9562)}})
-
-
-;;(defn print-chars [chars-rendered] (doseq [a-char chars-rendered] (println (str "*** " a-char " ***"))))
-
-;; Abstractly, display a grid.  This should eventually call an imported display library based on the output device used
-;(defn print-test-border [render-chars] (let [tl ((comp :top-left :border) render-chars)
-;                                                t ((comp :top :border) render-chars)
-;                                                tr ((comp :top-right :border) render-chars)
-;                                                l ((comp :left :border) render-chars)
-;                                                r ((comp :right :border) render-chars)
-;                                                bl (get-in render-chars [:border :bottom-left])
-;                                                b (get-in render-chars [:border :bottom])
-;                                                br (get-in render-chars [:border :bottom-right])
-;                                                on (get-in render-chars [:cells :on])
-;                                                off (get-in render-chars [:cells :off])]
-;                                          (println (str tl t t t tr))
-;                                          (println (str l off off off r))
-;                                          (println (str l off on off r))
-;                                          (println (str l off off off r))
-;                                          (println (str bl b b b br))))
-
-
-;(defn string-repeating-char
-;    "Repeat supplied character"
-;    [a-char times]
-;    (apply str (repeat times a-char)))
-;
-;(defn add-border-top
-;    "Add top border"
-;    [render-view-chars border-width]
-;        (let [top-left-char (get-in render-view-chars [:border :top-left])
-;              top-right-char (get-in render-view-chars [:border :top-right])
-;              top-char (get-in render-view-chars [:border :top])]
-;;                 (println "Border has width of " border-width)
-;                 (apply str [top-left-char
-;                             (string-repeating-char top-char border-width)
-;                             top-right-char])))
-;
-;(defn add-border-sides-to-row
-;    "Add border sides to single row"
-;    [render-view-chars render-row]
-;        (let [right-char (get-in render-view-chars [:border :right])
-;              left-char (get-in render-view-chars [:border :left])]
-;                 (apply str (concat (str left-char)
-;                                    render-row
-;                                    (str right-char)))))
-;
-;(defn add-border-sides
-;    "Add border sides to group of rows"
-;    [render-view-chars render-grid]
-;        (let [right-char (get-in render-view-chars [:border :right])
-;              left-char (get-in render-view-chars [:border :left])]
-;                 (reduce (fn [bordered-grid render-row] (conj bordered-grid (add-border-sides-to-row render-chars render-row))) []  render-grid)))
-;
-;(defn add-border-bottom
-;    "Add border bottom"
-;    [render-view-chars border-width]
-;        (let [bottom-left-char (get-in render-view-chars [:border :bottom-left])
-;              bottom-right-char (get-in render-view-chars [:border :bottom-right])
-;              bottom-char (get-in render-view-chars [:border :bottom])]
-;;                 (println "Width has value of " border-width)
-;                 (apply str [bottom-left-char
-;                             (string-repeating-char bottom-char border-width)
-;                             bottom-right-char])))
-;;
-;;; SOMETHING LIKE THIS:
-;;; (->> a-grid (concat [["a" "b" "c"]]) (concat [["x" "y" "z"]])) 
-;;;(defn add-border [grid] (->> (add-border-sides grid) (concat [(add-border-top (count (first grid)))]) (concat [(add-border-bottom (count (first grid)))]) (map println) ))
-;(defn add-border
-;    "Add border to list of strings"
-;    [render-chars grid]
-;    (doseq [grid-row (vector (add-border-top render-chars (count (first grid)))
-;                             (add-border-sides render-chars grid)
-;                             (add-border-bottom render-chars (count (first grid))))]
-;           (println grid-row)))
-;
-;;; This function should act like a decorator.  Does it need refactoring?
-;(defn with-border
-;    "Display border of characters defined by 'render-chars' around content"
-;    [render-chars content]
-;        (let [content-width (count (first content))]
-;                (-> [(add-border-top render-chars content-width)]
-;                    (into (add-border-sides render-chars content))
-;                    (into [(add-border-bottom render-chars content-width)]))))
-;
-;; for each row in grid, add border-left to front and border-right to end of row
-;; add new row to front of grid that's border top
-;; add new row to back of grid that's border bottom
-
-;(defn row-to-render-row
-;    "Take a generation and return a list consumable by the View functions."
-;    [row]
-;    (reduce (fn [render-row cell] (if cell (conj render-row :on) (conj render-row :off))) [] row))
-;
-;(defn render-row-to-str
-;    "Take a View-friendly generation and return a string ready for display rendering."
-;    [render-row]
-;    (apply str (map #(get (get render-chars :cells) %) render-row)))
-;
-;;(defn rendered-grid [grid] (map render-row-to-str (map row-to-render-row grid)))
-;
-;(defn rendered-grid
-;    [grid] (->> grid
-;                (map row-to-render-row)
-;                (map render-row-to-str)))
-
-;; (map println (map render-row-to-str (map row-to-render-row (calculate-grid (create-rule 172) 20 [false true false false true true false true false]))) )
-
-;;;; How many generations to display?  Three scenarios exist (the first two make assumptions based on immutable data):
+;;;; If determining the maximum number of rows, how many generations should be displayed?  Three scenarios exist (the first two make assumptions based on immutable data):
 ;; 1) Each new generation is identical to the previous.  Stop after detecting n identical generations.
 ;; 2) The generations start repeating a pattern
 ;; 3) Reach a maximum number of generations and stop, regardless of any patterns
 
-;;
-;;(defn repeated-generations [numbers] ())
-;;
-;;(defn generation-pattern [] ())
-
-;;;;;;;;;;;;;;;;;;
-;; MOVE THESE TO TESTS, if necessary at all
-;; full rendering:
-; USE CASE 1: no border
-;(display-grid (rendered-grid (calculate-grid (create-rule 177) 45 [false false false false false false false false false false true false true false false false false false false false false])))
-;fail;
-; USE CASE 2: with border
-;(display-grid (with-border render-chars (rendered-grid (calculate-grid (create-rule 177) 45 [false false false false false false false false false false true false true false false false false false false false false]))))
-;(display-grid (add-border render-chars (rendered-grid (calculate-grid (create-rule 177) 45 [false false false false false false false false false false true false true false false false false false false false false]))))
-;
-;;;;;;;;;;;;;;;;;;
-
-
-;;  (map println (map render-row-to-str (map row-to-render-row rendered-grid))))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; UI Functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(def ui-messages {:greeting "Hello!"
-                  :grid-width "Please enter a grid width."
-                  :generations "How many generations would you like to see?"
-                  :initial-row "Do you want to set the initial generation?"
-                  :which-rule "Which rule would you like to use (Enter a number between [0, 255], or h for help)"
-                  :exiting "Goodbye!"})
-
-(defn display-message
-    "Print a message to the screen."
-    [message-key]
-    (println (message-key ui-messages)))
 
 (defn convert-str-to-type
     [constructor-fn input-string]
@@ -264,57 +97,17 @@
     "Convert a string to an Integer, else throw an exception"
     (partial convert-str-to-type #(Integer. %)))
 
-;; 1. Display message to user
-;; 2. Start input prompt
-;; 3. Validate input
-;;   if (validation-failed)
-;;     go to 2
-
-(defn ask-input
-    "Ask for input, optionally returning a default value.  May default to nil, indicating no input and no default value."
-    ([]
-        (ask-input nil))
-    ([default-value]
-        (let [input-value (read-line)]
-            (if (empty? input-value)
-                default-value
-                input-value))))
-
-(defn ask-input-with-message
-    "Prompt user for input with message, optionally display default value."
-    ([message-key]
-        (do (display-message message-key)
-            (ask-input)))
-    ([message-key converter-fn]
-        (do (println (str (message-key ui-messages) ":"))
-            (converter-fn (ask-input))))
-    ([message-key converter-fn default-value]
-        (do (println (str (message-key ui-messages) ": [" default-value "]"))
-            (converter-fn (ask-input default-value)))))
-
-;;                             ([message-key validation-fn default-value] (do (println (str (message-key ui-messages) " (" (apply str (map #(str % ",") valid-inputs)) ") : [" default-value "]")) (ask-input default-value))))
-
-;;(defn run-ui [messages ui-messages] ())
-
 (defn ask-grid-width
     "Ask user for desired grid width."
     [default-width]
-    (ask-input-with-message :grid-width str-to-int default-width))
+    (input/ask-input-with-message (:grid-width ui-messages) str-to-int default-width))
 
 (defn ask-initial-row
     "Ask user for initial generation."
     [default-row]
-    (ask-input-with-message :initial-row (->> [false false true false false]
+    (input/ask-input-with-message (:initial-row ui-messages) (->> [false false true false false]
                                               graphics/row-to-render-row
                                               graphics/render-row-to-str)))
-
-;;  (ask-input-with-message :initial-row (->> (DEFAULT-ROW ???) row-to-render-row render-row-to-str)))
-
-;(defn ask-generations [default-generations] (ask-input-with-message :generations ))
-
-;MOVE THIS TO THE PROPER SECTION
-;(defn get-initial-row [INT] (create-initial-width)
-;                      [bools[]] pass on)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; High-Level Control Functions
@@ -322,16 +115,14 @@
 (defn interactive-cellular-automata
     "Prompt user for input and display corresponding cellular automoata"
     []
-    (do (display-message :greeting)
-        (let [rule (ask-input-with-message :which-rule str-to-int)
+    (do (println (:greeting ui-messages))
+        (let [rule (input/ask-input-with-message (:which-rule ui-messages) str-to-int)
 
-              grid-width  (ask-input-with-message :grid-width str-to-int)
-              grid-height (ask-input-with-message :generations str-to-int)
+              grid-width (input/ask-input-with-message (:grid-width ui-messages) str-to-int)
+              grid-height (input/ask-input-with-message (:generations ui-messages) str-to-int)
               the-grid ()]
              (graphics/display-grid (graphics/with-border graphics/render-chars (graphics/rendered-grid (calculate-grid (create-rule rule) grid-height (graphics/create-initial-row grid-width))))))
-;              grid-height (ask-input-with-message :generations str-to-int)]
-;             (graphics/display-grid (with-border render-chars (rendered-grid (calculate-grid (create-rule rule) grid-height (graphics/create-initial-row grid-width))))))
-        (display-message :exiting)))
+        (println (:exiting ui-messages))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; MAIN
