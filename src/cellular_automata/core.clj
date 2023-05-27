@@ -60,11 +60,8 @@
 (defn create-initial-row
     "Create a starting row of odd width with one 'on' cell in center of row"
     [width]
-    (let [row-width (str-to-int width)
-          init-row (pad-sides-with true (repeat (/ row-width 2) false))]
-        (if (> (count init-row) width)
-            (into [] (drop 1 init-row))
-            init-row)))
+    (let [row-width (str-to-int width)]
+          (pad-sides-with true (repeat (- (/ row-width 2) (rem (+ width 1) 2)) false))))
 
 (defn calculate-next-generation
     "Process a generation using a rule and return next generation.
