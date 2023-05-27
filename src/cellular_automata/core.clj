@@ -3,9 +3,6 @@
 
 (require '[cellular-automata.graphics :as graphics]
          '[cellular-automata.input :as input])
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Business Logic
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def rule-keys [[true true true]
                 [true true false]
@@ -90,9 +87,6 @@
             rule)
         false))
 
-;; Inputting the number of generations, and an optional array of values for 1st generation
-;; Outputs a grid of (arraywidth + 2), or calculate width based on final generation
-;; Starting generation is optional, default is 1 true in center
 (defn calculate-grid
     "Calculate grid of specified length using either a supplied or default starting generation."
     ([rule num-of-rows initial-row]
@@ -102,12 +96,6 @@
                 (recur (conj grid (into (vector) (get-next-row (last grid) rule))) (inc counter)))))
     ([rule num-of-rows]
         (calculate-grid rule num-of-rows [false false false false true false false false false])))
- 
-;;;; If determining the maximum number of rows, how many generations should be displayed?  Three scenarios exist (the first two make assumptions based on immutable data):
-;; 1) Each new generation is identical to the previous.  Stop after detecting n identical generations.
-;; 2) The generations start repeating a pattern
-;; 3) Reach a maximum number of generations and stop, regardless of any patterns
-
 
 (defn interactive-cellular-automata
     "Prompt user for input and display corresponding cellular automoata"

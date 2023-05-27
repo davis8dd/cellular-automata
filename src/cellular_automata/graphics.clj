@@ -1,10 +1,6 @@
 (ns cellular-automata.graphics
     (:gen-class))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Render functions
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 (def render-chars {:cells {:on (char 9607)
                            :off (char 9617)}
                            :border {:top (char 9552)
@@ -15,15 +11,6 @@
                            :bottom-right (char 9565)
                            :top-left (char 9556)
                            :bottom-left (char 9562)}})
-
-;(defn create-initial-row
-;    "Create a starting row of odd width with one 'on' cell in center of row"
-;    [width]
-;    (let [row-width (str-to-int width)
-;          init-row (pad-sides-with true (repeat (/ row-width 2) false))]
-;        (if (> (count init-row) width)
-;            (into [] (drop 1 init-row))
-;            init-row)))
 
 (defn display-grid
     "Display rendered grid of cellular automata."

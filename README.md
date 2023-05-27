@@ -45,6 +45,10 @@ You will be prompted with the following options:
 - 177
 - 135
 
+### To do
+- [ ] Add input validation.
+- [ ] 
+
 ## License
 
 Distributed under the GNU General Public License version 3.
