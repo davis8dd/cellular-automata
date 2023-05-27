@@ -46,13 +46,13 @@
       (is (= (int-to-bool-array 34) expected-value)))))
 
 (deftest test-create-initial-row-given-row-width-expect-row-with-single-middle-value-set-to-true
-  (testing "Test create a row of false boolean values, with the exception of the middle which is 'on'"
+  (testing "Test create a row of false boolean values, with the exception of the middle which is 'on'."
     (let [row-width 7
           expected-result [false false false true false false false]]
       (is (= (create-initial-row row-width) expected-result)))))
 
 (deftest test-create-initial-row-with-even-length-expect-one-less-length-and-single-middle-value-set-to-true
-  (testing "Test create an odd row of false boolean values, removing one from an even-length row if necessary"
+  (testing "Test create an odd row of false boolean values, removing one from an even-length row if necessary."
     (let [row-width 8
           expected-result [false false false true false false false]]
       (is (= (create-initial-row row-width) expected-result)))))
@@ -67,7 +67,7 @@
       (is (= (pad-front-to-length-with initial-array final-size padding) expected-value))))
 
 (deftest test-calculate-next-generation-given-valid-rule-expect-next-row-generated-from-rule
-  (testing "That the passed rule is used to generate the next row"
+  (testing "That the passed rule is used to generate the next row."
     (let [a-vect (vector false false false true false false false)
           subvec-size 3
           rule {[false false false] true,
@@ -82,7 +82,7 @@
       (is (= (calculate-next-generation a-vect subvec-size rule) expected-result)))))
 
 (deftest test-calculate-grid-given-valid-rule-and-row-expect-calculated-grid
-  (testing "That a valid rule and initial generation generates a grid"
+  (testing "That a valid rule and initial generation generates a grid."
     (let [valid-rule {[false false false] true,
                 [true false false] false,
                 [false true false] false,
@@ -99,14 +99,14 @@
                            [false true true false false]]]
       (is (= (calculate-grid valid-rule number-of-rows initial-row) expected-result)))))
 
-(deftest test-str-to-int
-  (testing "That a valid rule and initial generation generates a grid"
+(deftest test-str-to-int-given-int-in-str-expect-int-of-same-value
+  (testing "Passing an integer as a string returns that integer."
     (let [input-value "123"
-          expected-result true]
+          expected-result 123]
       (is (= (str-to-int input-value) expected-result)))))
 
 (deftest test-interactive-cellular-automata-given-valid-input-expect-no-errors
-  (testing "That a valid rule and user input generates a grid. "
+  (testing "That a valid rule and user input generates a grid."
     (with-in-str "20\n3\n3"
       (let [expected-result nil]
        (is (= (interactive-cellular-automata) expected-result))))))

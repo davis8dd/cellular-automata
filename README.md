@@ -47,7 +47,6 @@ You will be prompted with the following options:
 
 ### To do
 - [ ] Add input validation.
-- [ ] 
 
 ## License
 

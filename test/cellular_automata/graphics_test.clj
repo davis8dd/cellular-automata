@@ -3,7 +3,7 @@
             [cellular-automata.graphics :refer :all]))
 
 (deftest test-string-repeating-char-given-character-and-times-to-repeat-expect-character-repeated-that-many-times
-  (testing "Test that the given character is repeated in a string the specified number of times"
+  (testing "Test that the given character is repeated in a string the specified number of times."
     (let [a-char \a
           times-to-repeat 5
           expected-result "aaaaa"]
@@ -22,7 +22,7 @@
       (is (= (render-row-to-string input-value) expected-result)))))
 
 (deftest test-grid-to-render-of-single-character-given-border-expect-3x3-grid-with-border
-  (testing "Render single character with a border, returning a 3x3 grid"
+  (testing "Render single character with a border, returning a 3x3 grid."
     (let [character-to-render \x
           grid-to-render [[character-to-render character-to-render] [character-to-render character-to-render] [character-to-render character-to-render]]
           expected-value [[(get-in render-chars [:border :top-left]) (get-in render-chars [:border :top]) (get-in render-chars [:border :top]) (get-in render-chars [:border :top-right])]
