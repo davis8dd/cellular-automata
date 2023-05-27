@@ -17,12 +17,9 @@ _______  _______  _______  _______  _______  _______  _______  _______
   |1|      |2|      |3|      |4|      |5|      |6|      |7|      |8|  
 ```
 
-## Installation
-
-It's recommended to use Leiningen to build and execute this Clojure project.
-
-### Prerequisites
-Your terminal must support Curses.
+## Build
+Clojure requires Java.  It's highly recommended to use Leiningen to run this Clojure project.
+All commands are executed in this folder in a terminal.
 
 ## Usage
 Start the program by opening a terminal window in this directory and then running
@@ -31,20 +28,22 @@ Start the program by opening a terminal window in this directory and then runnin
 
 You will be prompted with the following options:
 1. The rule to determine the initial state of the automaton.
-1. The width of the grid generated.  The initial state will always be at the center.
-1. The number of generations to calculate (i.e. the length of the grid generated).
-
-## Options
-
-The integer **rule** to use when initializing the first generation. Valid values are 1-256.
+1. The width of the grid.  A larger width displays more of the automaton's behavior.
+1. The number of generations to calculate.  Default is equal to the width (enter a blank value).
 
 ## Examples
-sdf
+- Run the interactive terminal program:
+`lein run`
 
-## References
+- Run unit tests:
+`lein test`
 
-1. https://mathworld.wolfram.com/CellularAutomaton.html
-1. https://natureofcode.com/book/chapter-7-cellular-automata/
+- Generate coverage from unit tests:
+`lein cloverage`
+
+### Interesting Rules
+- 177
+- 135
 
 ## License
 
