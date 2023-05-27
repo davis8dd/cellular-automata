@@ -9,27 +9,20 @@
           expected-result "aaaaa"]
       (is (= (string-repeating-char a-char times-to-repeat) expected-result)))))
 
-(deftest test-create-initial-row-given-row-width-expect-row-with-single-middle-value-set-to-true
-  (testing "Test create a row of false boolean values, with the exception of the middle which is 'on'"
-    (let [row-width 7
-          expected-result [false false false true false false false]]
-      (is (= (create-initial-row row-width) expected-result)))))
+(deftest test-row-to-render-row-given-boolean-sequence-expect-symbol-sequence-returned
+  (testing "asdf"
+    (let [input-value [true false true]
+          expected-result [:on :off :on]]
+      (is (= (row-to-render-row input-value) expected-result)))))
 
-(deftest test-pad-sides-with-given-char-expect-padded-sequence
-  (testing "Test that padding a sequence with a character returns the expected padded sequence."
-    (let [a-seq [1 2 3]
-          padding-value \#
-          expected-result [\# 1 2 3 \#]]
-      (is (= (pad-sides-with a-seq padding-value) expected-result)))))
+(deftest test-render-row-to-string-given-????-expect???
+  (testing "Render array of characters given character keys as input."
+    (let [input-value [:on :off :on]
+          expected-result (str (get-in render-chars [:cells :on]) (get-in render-chars [:cells :off]) (get-in render-chars [:cells :on]))]
+      (is (= (render-row-to-string input-value) expected-result)))))
 
-(deftest test-pad-sides-with-value-given-sequence-padding-expect-padding-with-sequence
-  (testing "Test that padding a sequence with a sequence returns the expected padded sequence."
-    (let [input-value [1 2 3]
-          expected-result [0 0 1 2 3 0 0]]
-      (is (= (pad-sides-with input-value [0 0]) expected-result)))))
-
-(deftest test-display-3x3-grid-of-single-character
-  (testing "Render 3x3 grid"
+(deftest test-grid-to-render-of-single-character-given-border-expect-3x3-grid-with-border
+  (testing "Render single character with a border, returning a 3x3 grid"
     (let [character-to-render \x
           grid-to-render [[character-to-render character-to-render] [character-to-render character-to-render] [character-to-render character-to-render]]
           expected-value [[(get-in render-chars [:border :top-left]) (get-in render-chars [:border :top]) (get-in render-chars [:border :top]) (get-in render-chars [:border :top-right])]

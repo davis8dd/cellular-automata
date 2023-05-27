@@ -7,14 +7,14 @@
 ;; Business Logic
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def rule-keys [[false false false]
-                [true false false]
-                [false true false]
-                [false false true]
+(def rule-keys [[true true true]
                 [true true false]
                 [true false true]
+                [true false false]
                 [false true true]
-                [true true true]])
+                [false true false]
+                [false false true]
+                [false false false]])
 
 (def ui-messages {:greeting "Welcome to the elementary cellular automata generator!"
                   :grid-width "Please enter a grid width."
@@ -45,6 +45,30 @@
       (> an-int 255) nil
       :else (zipmap rule-keys (int-to-bool-array an-int)))) ;; Return a set of (front-value, on/off) pairs for all front-things
 
+(defn convert-str-to-type
+    [constructor-fn input-string]
+    (try (constructor-fn input-string)
+         (catch NumberFormatException e (println "Please enter an integer."))))
+
+(def str-to-int
+    "Convert a string to an Integer, else throw an exception"
+    (partial convert-str-to-type #(Integer. %)))
+
+(defn pad-sides-with
+    "Add supplied value to front and back of a sequence."
+    [a-coll padding-value]
+    (into [] (flatten
+                 (concat [padding-value] [a-coll] [padding-value]))))
+
+(defn create-initial-row
+    "Create a starting row of odd width with one 'on' cell in center of row"
+    [width]
+    (let [row-width (str-to-int width)
+          init-row (pad-sides-with true (repeat (/ row-width 2) false))]
+        (if (> (count init-row) width)
+            (into [] (drop 1 init-row))
+            init-row)))
+
 (defn calculate-next-generation
     "Process a generation using a rule and return next generation.
      The rule specifies each element in the next generation
@@ -59,7 +83,7 @@
 (defn get-next-row
     "Return next row in grid by calculating new generation."
     [a-vect rule]
-    (graphics/pad-sides-with
+    (pad-sides-with
         (calculate-next-generation
             a-vect
             3
@@ -84,34 +108,7 @@
 ;; 2) The generations start repeating a pattern
 ;; 3) Reach a maximum number of generations and stop, regardless of any patterns
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; UI Functions
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn convert-str-to-type
-    [constructor-fn input-string]
-    (try (constructor-fn input-string)
-         (catch NumberFormatException e (println "Please enter an integer."))))
-
-(def str-to-int
-    "Convert a string to an Integer, else throw an exception"
-    (partial convert-str-to-type #(Integer. %)))
-
-(defn ask-grid-width
-    "Ask user for desired grid width."
-    [default-width]
-    (input/ask-input-with-message (:grid-width ui-messages) str-to-int default-width))
-
-(defn ask-initial-row
-    "Ask user for initial generation."
-    [default-row]
-    (input/ask-input-with-message (:initial-row ui-messages) (->> [false false true false false]
-                                              graphics/row-to-render-row
-                                              graphics/render-row-to-str)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; High-Level Control Functions
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn interactive-cellular-automata
     "Prompt user for input and display corresponding cellular automoata"
     []
@@ -121,12 +118,9 @@
               grid-width (input/ask-input-with-message (:grid-width ui-messages) str-to-int)
               grid-height (input/ask-input-with-message (:generations ui-messages) str-to-int)
               the-grid ()]
-             (graphics/display-grid (graphics/with-border graphics/render-chars (graphics/rendered-grid (calculate-grid (create-rule rule) grid-height (graphics/create-initial-row grid-width))))))
+             (graphics/display-grid (graphics/with-border graphics/render-chars (graphics/rendered-grid (calculate-grid (create-rule rule) grid-height (create-initial-row grid-width))))))
         (println (:exiting ui-messages))))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; MAIN
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn -main
     "Run interactive cellular automata function"
     [& args]

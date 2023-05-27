@@ -5,9 +5,6 @@
 ;; Render functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; An example of displaying a grid.  This should probably be a unit test
-;(display-grid (calculate-grid (create-rule 177) 50 [false false false false false false false false false false true false false false false false false false false false false]))
-
 (def render-chars {:cells {:on (char 9607)
                            :off (char 9617)}
                            :border {:top (char 9552)
@@ -19,19 +16,14 @@
                            :top-left (char 9556)
                            :bottom-left (char 9562)}})
 
-(defn pad-sides-with
-    "Add supplied value to front and back of a sequence."
-    [a-coll padding-value]
-    (into [] (flatten
-                 (concat [padding-value] [a-coll] [padding-value]))))
-
-(defn create-initial-row
-    "Create a starting row of specified width with one 'on' cell in center of row"
-    [width]
-    (let [init-row (pad-sides-with true (repeat (/ width 2) false))]
-        (if (> (count init-row) width)
-            (into [] (drop 1 init-row))
-            init-row)))
+;(defn create-initial-row
+;    "Create a starting row of odd width with one 'on' cell in center of row"
+;    [width]
+;    (let [row-width (str-to-int width)
+;          init-row (pad-sides-with true (repeat (/ row-width 2) false))]
+;        (if (> (count init-row) width)
+;            (into [] (drop 1 init-row))
+;            init-row)))
 
 (defn display-grid
     "Display rendered grid of cellular automata."
@@ -92,7 +84,7 @@
     [row]
     (reduce (fn [render-row cell] (if cell (conj render-row :on) (conj render-row :off))) [] row))
 
-(defn render-row-to-str
+(defn render-row-to-string
     "Take a View-friendly generation and return a string ready for display rendering."
     [render-row]
     (apply str (map #(get (get render-chars :cells) %) render-row)))
@@ -100,4 +92,4 @@
 (defn rendered-grid
     [grid] (->> grid
                 (map row-to-render-row)
-                (map render-row-to-str)))
+                (map render-row-to-string)))
